@@ -5,10 +5,10 @@ import { auth } from "../utils/Firebase";
 
 
 
-const AuthContext = createContext()
+export const AuthContext = createContext()
 
 
- function AuthContextProvider({childern}){
+ function AuthContextProvider({children}){
 
     const [User , setUser] = useState({
         islogin : false,
@@ -16,11 +16,23 @@ const AuthContext = createContext()
 
     })
 
+    
+
     const [loder , setloder] = useState(true)
     // Handle user state changes
   function onAuthhanged(user) {
-    setUser(user);
-    console.log("user===>",user);
+    // console.log('user==>',user);
+    
+    if(user){
+      setUser({islogin : true , userInfo : {
+        name : user?.displayName,
+        email : user?.email,
+        Photo : user?.photoURL
+      }})
+    }else{
+      setUser({islogin : false , userInfo :  ''})
+
+    }
     
    setloder(false)
   }
@@ -37,12 +49,12 @@ const AuthContext = createContext()
     <AuthContext.Provider value={{User,setUser}}>
       {
         loder ? (
-          <div className="text-center flex items-center justify-center w-full h-full">
+          <div className="text-center flex items-center justify-center w-full h-96">
             <Spinner />
           </div>
         ) :
 
-        (childern)
+        (children)
           
       }
     </AuthContext.Provider>

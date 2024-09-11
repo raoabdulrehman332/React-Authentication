@@ -1,16 +1,19 @@
 import { signInWithPopup , GoogleAuthProvider } from 'firebase/auth';
 import React, { useState } from 'react'
 import { auth } from '../utils/Firebase';
-import {Input} from "@nextui-org/react";
+import {Button, Input} from "@nextui-org/react";
+import { useNavigate } from 'react-router';
+import { signInWithEmailAndPassword } from 'firebase/auth/web-extension';
 
 
 
 export default function SignIn() {
 
-  
-  
+  const navgate = useNavigate()
+
   const [Email , SetEmail] = useState('')
   const [Password , SetPassword] = useState('')
+  const [loder , setloder] = useState(false)
   
   
   const handleSignInWithGoogle = ()=>{
@@ -28,6 +31,7 @@ export default function SignIn() {
     // The signed-in user info.
     const user = result.user;
     console.log('user==>',user);
+    navgate('/')
     
     // IdP data available using getAdditionalUserInfo(result)
     // ...
@@ -47,6 +51,31 @@ export default function SignIn() {
     // ...
   });
   }
+
+  
+  
+ 
+
+  
+
+async function handleSignIn(){
+
+
+  try{
+    setloder(true)
+    await signInWithEmailAndPassword(auth , Email , Password).then(()=> {
+      setloder(false)
+      navgate('/')
+    });
+ } catch (err){
+  setloder(false)
+  console.log('error==>',err);
+  
+ }
+}
+  
+
+ 
   return (
     <>
      
@@ -55,7 +84,8 @@ export default function SignIn() {
         <h2 className="text-3xl font-extrabold text-center text-gray-900">
           Sign In 
         </h2>
-        <form className="space-y-4">
+        {/* <form className="space-y-4"
+        > */}
 
 
           {/* Email */}
@@ -95,12 +125,14 @@ export default function SignIn() {
 
           {/* Sign Up Button */}
           <div className="pt-4">
-            <button
+            <Button
               // type="submit"
+              onClick={handleSignIn}
+              isLoading={loder}
               className="w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               Sign in
-            </button>
+            </Button>
 
           </div>
             <h1 className='my-auto mx-2'>OR</h1>
@@ -117,7 +149,7 @@ export default function SignIn() {
 
           </div>
 
-        </form>
+        {/* </form> */}
       </div>
     </div>
     </>

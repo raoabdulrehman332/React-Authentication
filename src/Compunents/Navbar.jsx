@@ -1,6 +1,11 @@
-import React from "react";
-import {Navbar, NavbarBrand, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, NavbarContent, NavbarItem,  Button} from "@nextui-org/react";
+import React, { useContext } from "react";
+import {Navbar, NavbarBrand, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, NavbarContent, NavbarItem,  Button, Avatar} from "@nextui-org/react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import { signOut } from "firebase/auth/web-extension";
+import { auth } from "../utils/Firebase";
+import Swal from "sweetalert2";
+
 
 
 
@@ -17,6 +22,25 @@ export const AcmeLogo = () => (
 );
 
 export default function App() {
+
+ const {User , setUser } = useContext(AuthContext)
+
+ async function handleLogOut(){
+
+ await Swal.fire({
+    title: "You sure",
+    
+    icon: "question",
+    showCancelButton: true
+  }).then((result)=>{
+    if(result.isConfirmed){
+      Swal.fire("Account has Sign Out", "", "success");
+      signOut(auth)
+    }
+  });
+
+  }
+  
   const menuItems = [
     "Profile",
     "Dashboard",
@@ -64,17 +88,42 @@ export default function App() {
           </Link>
         </NavbarItem>
       </NavbarContent>
-
+       
       <NavbarContent justify="end">
+       {
+        User?.islogin ?
+        <div className="my-2 flex items-center justify-center">
+          <h1 >{User?.userInfo.email}</h1>
+        </div>
+        :
+
         <NavbarItem className="hidden lg:flex">
           <Link to={'/SignIn'}>Login</Link>
         </NavbarItem>
+
+       }
+
+        {
+          User?.islogin ?
+          <Avatar src={User?.userInfo.Photo}  size="md"/>
+          :
+
         <NavbarItem>
           <Button to={'/Signup'} as={Link} color="warning" href="#" variant="flat">
             Sign Up
           </Button>
         </NavbarItem>
-      </NavbarContent>
+        }
+
+        {
+          User?.islogin ?
+          <Button color="primary" variant="light" onClick={handleLogOut}>
+           Log Out
+           </Button>
+          :
+          ''
+        }
+        </NavbarContent>
 
       <NavbarMenu>
         {menuItems.map((item, index) => (

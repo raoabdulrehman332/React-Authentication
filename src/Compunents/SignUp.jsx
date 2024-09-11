@@ -1,11 +1,35 @@
 import React, { useState } from 'react'
 import {Input} from "@nextui-org/react";
+import { auth } from '../utils/Firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 function SighUp(){
 
   const [Email , SetEmail] = useState('')
   const [user , SetUser] = useState('')
   const [Password , SetPassword] = useState('')
+
+  function handleSignUp(){
+
+    createUserWithEmailAndPassword(auth, Email, Password)
+  .then((userCredential) => {
+    // Signed up 
+    const user = userCredential.user;
+    console.log('user===>',user);
+    
+    
+    // ...
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    console.log('errorCode===>',errorCode);
+
+    const errorMessage = error.message;
+    console.log('errorMessage===>',errorMessage);
+
+    // ..
+  });
+  }
 
     return(
 
@@ -15,7 +39,7 @@ function SighUp(){
         <h2 className="text-3xl font-extrabold text-center text-gray-900">
           Create Your Account
         </h2>
-        <form className="space-y-4">
+        
           {/* Full Name */}
           <div>
             <Input
@@ -69,12 +93,13 @@ function SighUp(){
           <div className="pt-4">
             <button
               type="submit"
+              onClick={handleSignUp}
               className="w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               Sign Up
             </button>
           </div>
-        </form>
+
       </div>
     </div>
   
