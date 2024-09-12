@@ -1,9 +1,12 @@
 import { signInWithPopup , GoogleAuthProvider } from 'firebase/auth';
 import React, { useState } from 'react'
 import { auth } from '../utils/Firebase';
-import {Button, Input} from "@nextui-org/react";
+import {Button} from "@nextui-org/react";
+import {Input} from "@nextui-org/input";
 import { useNavigate } from 'react-router';
 import { signInWithEmailAndPassword } from 'firebase/auth/web-extension';
+import Swal from 'sweetalert2';
+
 
 
 
@@ -14,9 +17,11 @@ export default function SignIn() {
   const [Email , SetEmail] = useState('')
   const [Password , SetPassword] = useState('')
   const [loder , setloder] = useState(false)
+  const [loderGogle , setloderGogle] = useState(false)
   
   
   const handleSignInWithGoogle = ()=>{
+    setloderGogle(true)
     const provider = new GoogleAuthProvider();
     provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
     
@@ -24,6 +29,7 @@ export default function SignIn() {
     .then((result) => {
       
     console.log('result==>',result);
+    setloderGogle(false)
     
     // This gives you a Google Access Token. You can use it to access the Google API.
     const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -32,17 +38,24 @@ export default function SignIn() {
     const user = result.user;
     console.log('user==>',user);
     navgate('/')
+    SetEmail('')
+    SetPassword('')
+    SetUser('')
     
     // IdP data available using getAdditionalUserInfo(result)
     // ...
   }).catch((error) => {
     console.log('error==>',error);
+    setloderGogle(false)
     
     // Handle Errors here.
     const errorCode = error.code;
     const errorMessage = error.message;
     console.log('errorCode==>',errorCode);
     console.log('errorMessage==>',errorMessage);
+    SetEmail('')
+    SetPassword('')
+    SetUser('')
     
     // The email of the user's account used.
     const email = error.customData.email;
@@ -65,16 +78,36 @@ async function handleSignIn(){
     setloder(true)
     await signInWithEmailAndPassword(auth , Email , Password).then(()=> {
       setloder(false)
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Your Account has Created",
+        showConfirmButton: false,
+        timer: 1500
+      });
       navgate('/')
     });
  } catch (err){
   setloder(false)
   console.log('error==>',err);
+  Swal.fire({
+    title: "Oops...",
+    text: `ErrorMessage : ${err}` ,
+    icon: "error"
+  });
+  SetEmail('')
+  SetPassword('')
+  SetUser('')
   
  }
 }
-  
+function Clear(){
+  SetPassword('')
+}
 
+function ClearEmail(){
+  SetEmail('')
+}
  
   return (
     <>
@@ -84,8 +117,7 @@ async function handleSignIn(){
         <h2 className="text-3xl font-extrabold text-center text-gray-900">
           Sign In 
         </h2>
-        {/* <form className="space-y-4"
-        > */}
+        
 
 
           {/* Email */}
@@ -100,7 +132,7 @@ async function handleSignIn(){
              variant="bordered"
              placeholder="Enter your email"
              defaultValue=""
-             onClear={() => console.log("input cleared")}
+             onClear={ClearEmail}
              className=" w-full px-3 py-2 mt-1"
              />
           </div>
@@ -117,7 +149,7 @@ async function handleSignIn(){
              variant="bordered"
              placeholder="Enter your email"
              defaultValue=""
-             onClear={() => console.log("input cleared")}
+             onClear={Clear}
              className=" w-full px-3 py-2 mt-1"
              />
           </div>
@@ -139,13 +171,14 @@ async function handleSignIn(){
 
             {/* Sign Up Button */}
           <div className="pt-2">
-            <button
+            <Button
               // type="submit"
+              isLoading={loderGogle}
               onClick={handleSignInWithGoogle}
               className="w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               Sign in with Google
-            </button>
+            </Button>
 
           </div>
 

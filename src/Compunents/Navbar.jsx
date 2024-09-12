@@ -24,6 +24,8 @@ export const AcmeLogo = () => (
 export default function App() {
 
  const {User , setUser } = useContext(AuthContext)
+ 
+ 
 
  async function handleLogOut(){
 
@@ -105,7 +107,8 @@ export default function App() {
 
         {
           User?.islogin ?
-          <Avatar src={User?.userInfo.Photo}  size="md"/>
+          <Avatar src={User?.userInfo.Photo}  size="md" className="object-cover"/>
+
           :
 
         <NavbarItem>
